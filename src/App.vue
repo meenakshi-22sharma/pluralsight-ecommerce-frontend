@@ -1,15 +1,40 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <nav>
+    <HeaderHome />
+    <router-view v-if="products && categories" :baseURL="baseURL" :products="products" :categories="categories"
+      @fetchData="fetchData">
+    </router-view>
+  </nav>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+const axios = require('axios');
+
+import HeaderHome from "./components/HeaderHome.vue"
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      baseURL: "http://localhost:8000/",
+      products: null,
+      categories: null
+    }
+  },
+  components: { HeaderHome },
+
+  methods: {
+    async fetchData() {
+      await axios.get(this.baseURL + "product/")
+        .then(res => this.products = res.data)
+        .catch(err => console.log(err))
+
+      await axios.get(this.baseURL + "category/")
+        .then(res => this.categories = res.data)
+        .catch(err => console.log(err))
+    }
+  },
+  mounted() {
+    this.fetchData();
   }
 }
 </script>
@@ -21,6 +46,18 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+nav {
+  padding: 30px;
+}
+
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+nav a.router-link-exact-active {
+  color: #42b983;
 }
 </style>
